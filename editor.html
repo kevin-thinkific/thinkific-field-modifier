@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Thinkific Field Modifier</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#1c1c1a;--bg1:#252523;--bg2:#2e2e2c;--bg3:#363634;
+  --border:#3a3a38;--border-s:#4a4a48;
+  --text:#e8e8e5;--text2:#a0a09d;--text3:#666663;
+  --a-bg:#1e2d4a;--a-bd:#2d4a80;--a-tx:#7ba7f5;
+  --p-bg:#231f3d;--p-bd:#3d3580;--p-tx:#a99ef5;
+  --o-bg:#2a2010;--o-bd:#6b4f1a;--o-tx:#f5c842;
+  --r-bg:#2a1515;--r-bd:#7a2020;--r-tx:#f87171;
+  --g-bg:#0f2a18;--g-bd:#166534;--g-tx:#4ade80;
+  --m-bg:#1a2a1a;--m-bd:#2d5a2d;--m-tx:#6ddd6d;
+  --page:#131312;
+}
+.light{
+  --bg:#ffffff;--bg1:#f5f5f4;--bg2:#ebebea;--bg3:#e0e0de;
+  --border:#e0dedd;--border-s:#c8c7c5;
+  --text:#1a1a18;--text2:#5a5a58;--text3:#909090;
+  --a-bg:#e8f0fe;--a-bd:#aac4f7;--a-tx:#1a56db;
+  --p-bg:#f0effe;--p-bd:#c4bdf7;--p-tx:#5b4fd4;
+  --o-bg:#fef9ec;--o-bd:#f5d97a;--o-tx:#92650a;
+  --r-bg:#fef2f2;--r-bd:#fca5a5;--r-tx:#b91c1c;
+  --g-bg:#f0fdf4;--g-bd:#86efac;--g-tx:#15803d;
+  --m-bg:#f0fff0;--m-bd:#86d986;--m-tx:#166016;
+  --page:#f5f5f4;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--page);color:var(--text);min-height:100vh}
+.header{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:var(--bg1);border-bottom:0.5px solid var(--border);position:sticky;top:0;z-index:50}
+.header-left{display:flex;align-items:center;gap:12px}
+.logo{width:28px;height:28px;border-radius:6px;background:#6366f1;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:white;flex-shrink:0}
+.title{font-size:15px;font-weight:600}
+.header-right{display:flex;align-items:center;gap:8px}
+.wrap{max-width:860px;margin:0 auto;padding:20px 24px}
+input[type=text],select,textarea{border:0.5px solid var(--border-s);border-radius:6px;background:var(--bg1);color:var(--text);font-family:inherit;font-size:13px;padding:6px 10px;outline:none;width:100%}
+input[type=text]:focus,select:focus,textarea:focus{border-color:var(--a-bd);box-shadow:0 0 0 2px var(--a-bg)}
+textarea{font-family:monospace;font-size:12px;resize:vertical;line-height:1.6}
+select{cursor:pointer}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;border:0.5px solid var(--border-s);background:transparent;color:var(--text);font-size:13px;font-weight:500;cursor:pointer;transition:background .12s;white-space:nowrap;font-family:inherit}
+.btn:hover{background:var(--bg2)}
+.btn.sm{padding:4px 10px;font-size:12px}
+.btn.xs{padding:2px 7px;font-size:11px}
+.btn.accent{color:var(--a-tx);border-color:var(--a-bd)}
+.btn.accent:hover{background:var(--a-bg)}
+.btn.primary{background:#6366f1;color:white;border-color:transparent}
+.btn.primary:hover{background:#5558e8}
+.btn.danger{color:var(--r-tx);border-color:var(--r-bd)}
+.btn.danger:hover{background:var(--r-bg)}
+.btn.add{color:var(--g-tx);border-color:var(--g-bd)}
+.btn.add:hover{background:var(--g-bg)}
+.theme-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:20px;border:0.5px solid var(--border-s);background:var(--bg2);cursor:pointer;font-size:12px;color:var(--text2);font-family:inherit}
+.theme-btn:hover{background:var(--bg3)}
+.stepper{display:flex;align-items:center;gap:8px}
+.stepper button{width:28px;height:28px;border-radius:6px;border:0.5px solid var(--border-s);background:var(--bg1);color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit}
+.stepper button:hover{background:var(--bg2)}
+.stepper .count{font-size:15px;font-weight:500;min-width:24px;text-align:center}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;flex-wrap:wrap}
+.topbar-l{display:flex;align-items:center;gap:10px}
+.tabs{display:flex;border:0.5px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px}
+.tab{flex:1;padding:8px 14px;font-size:13px;font-weight:500;cursor:pointer;background:var(--bg1);color:var(--text2);border:none;text-align:center;transition:all .12s;font-family:inherit}
+.tab.active{background:var(--bg);color:var(--text)}
+.tab:not(:last-child){border-right:0.5px solid var(--border)}
+.field-row{background:var(--bg1);border:0.5px solid var(--border);border-radius:7px;padding:12px 14px;margin-bottom:10px;transition:opacity .12s,box-shadow .12s}
+.field-row.dragging{opacity:.35}
+.field-row.drag-over{box-shadow:0 0 0 2px var(--a-bd) inset}
+.field-header{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.drag-handle{cursor:grab;color:var(--text3);font-size:15px;line-height:1;padding:2px 3px;flex-shrink:0;user-select:none}
+.drag-handle:hover{color:var(--text)}
+.drag-handle:active{cursor:grabbing}
+.field-idx{background:var(--a-bg);color:var(--a-tx);border:0.5px solid var(--a-bd);border-radius:20px;font-size:11px;font-weight:500;padding:2px 9px;flex-shrink:0}
+.mods-group{margin-bottom:0}
+.mods-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:5px;align-items:center}
+.mods-label{font-size:11px;color:var(--text3);min-width:76px;flex-shrink:0}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border-s);background:var(--bg2);color:var(--text2);transition:all .12s;user-select:none}
+.chip.a{background:var(--a-bg);border-color:var(--a-bd);color:var(--a-tx)}
+.chip.p{background:var(--p-bg);border-color:var(--p-bd);color:var(--p-tx)}
+.chip.o{background:var(--o-bg);border-color:var(--o-bd);color:var(--o-tx)}
+.chip.r{background:var(--r-bg);border-color:var(--r-bd);color:var(--r-tx)}
+.chip.m{background:var(--m-bg);border-color:var(--m-bd);color:var(--m-tx)}
+.chip.disabled{opacity:.35;cursor:not-allowed;pointer-events:none}
+.chip.locked{border-style:dashed}
+.sub{background:var(--bg2);border:0.5px solid var(--border);border-radius:6px;padding:10px 12px;margin-top:9px}
+.sub-label{font-size:12px;color:var(--text2);display:block;margin-bottom:5px;font-weight:500}
+.sub-label-light{font-size:12px;color:var(--text3);display:block;margin-bottom:5px}
+.code-wrap{background:var(--bg1);border:0.5px solid var(--border);border-radius:6px;padding:14px;font-family:monospace;font-size:12px;line-height:1.7;white-space:pre;overflow-x:auto;max-height:480px;overflow-y:auto;color:var(--text)}
+.code-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.notice{background:var(--a-bg);border:0.5px solid var(--a-bd);border-radius:6px;padding:9px 12px;font-size:12px;color:var(--a-tx);margin-bottom:12px;line-height:1.5}
+.notice.success{background:var(--m-bg);border-color:var(--m-bd);color:var(--m-tx)}
+.notice.scan{background:#1a1a2e;border-color:#2d2d80;color:#7b7bf5}
+.cond-block{background:var(--bg1);border:0.5px solid var(--border);border-radius:7px;padding:12px 14px;margin-bottom:10px}
+.cond-block-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.rule-row{display:flex;gap:6px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
+.rule-row select{flex:1;min-width:100px}
+.rule-row input{flex:1;min-width:80px}
+.entry-box{background:var(--bg2);border:0.5px solid var(--border);border-radius:6px;padding:10px;margin-bottom:8px}
+.entry-inner{background:var(--bg3);border:0.5px solid var(--border);border-radius:6px;padding:9px 10px;margin-bottom:6px}
+.hint{font-size:11px;color:var(--text3);margin-top:3px}
+.info-pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--text3);padding:2px 8px;border-radius:20px;border:0.5px solid var(--border);background:var(--bg2);margin-top:5px}
+.divider-line{border:none;border-top:0.5px solid var(--border);margin:7px 0}
+.page-panel{display:inline-flex;align-items:center;gap:6px;background:var(--bg2);border:0.5px solid var(--border-s);border-radius:6px;padding:4px 8px;margin-left:4px;vertical-align:middle}
+.page-check{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--text2);cursor:pointer;padding:2px 6px;border-radius:4px;transition:background .1s;white-space:nowrap}
+.page-check:hover{background:var(--bg3)}
+.page-check.on{color:var(--text);font-weight:500}
+.page-check input[type=checkbox]{accent-color:#6366f1;cursor:pointer;width:12px;height:12px}
+.ext-label{font-size:13px;color:var(--text3);white-space:nowrap;padding:6px 10px;background:var(--bg2);border:0.5px solid var(--border-s);border-left:none;border-radius:0 6px 6px 0;flex-shrink:0}
+.filename-row{display:flex;align-items:stretch}
+.filename-row input{border-radius:6px 0 0 6px;flex:1}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
+.modal{background:var(--bg);border:0.5px solid var(--border-s);border-radius:12px;padding:20px;width:100%;max-width:440px}
+.modal-title{font-size:14px;font-weight:600;margin-bottom:8px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.drop-zone{border:1.5px dashed var(--border-s);border-radius:8px;padding:28px 16px;text-align:center;cursor:pointer;transition:all .15s;color:var(--text2);font-size:13px}
+.drop-zone:hover,.drop-zone.over{border-color:var(--a-bd);background:var(--a-bg);color:var(--a-tx)}
+.dz-icon{font-size:28px;display:block;margin-bottom:8px;color:var(--text3)}
+.drop-zone.over .dz-icon,.drop-zone:hover .dz-icon{color:var(--a-tx)}
+.file-name{margin-top:7px;font-size:12px;color:var(--a-tx);font-family:monospace}
+.err-msg{font-size:12px;color:var(--r-tx);margin-top:7px}
+
+.sub-tabs{display:flex;gap:0;border:0.5px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px}
+.sub-tab{flex:1;padding:7px 12px;font-size:12px;font-weight:500;cursor:pointer;background:var(--bg1);color:var(--text2);border:none;text-align:center;transition:all .12s;font-family:inherit;border-right:0.5px solid var(--border)}
+.sub-tab:last-child{border-right:none}
+.sub-tab.active{background:var(--bg);color:var(--text);font-weight:600}
+.sub-tab:hover:not(.active){background:var(--bg2)}
+.cond-block{background:var(--bg1);border:0.5px solid var(--border);border-radius:7px;margin-bottom:10px;overflow:hidden}
+.cond-block-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;cursor:pointer;user-select:none}
+.cond-block-header:hover{background:var(--bg2)}
+.cond-block-body{padding:0 14px 12px 14px;border-top:0.5px solid var(--border)}
+.cond-block.collapsed .cond-block-body{display:none}
+.cond-block.collapsed .cond-block-header{border-bottom:none}
+.collapse-icon{font-size:11px;color:var(--text3);transition:transform .15s;margin-left:4px;flex-shrink:0}
+.cond-block.collapsed .collapse-icon{transform:rotate(-90deg)}
+.cond-summary{font-size:11px;color:var(--text3);margin-left:8px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── Code editor styles ── */
+.code-editor-wrap{position:relative;border:0.5px solid var(--border);border-radius:8px;overflow:hidden;background:#1a1b26;font-family:'Fira Code',Cascadia Code,Consolas,monospace;font-size:12px;line-height:1.6}
+.light .code-editor-wrap{background:#f8f9fc}
+.code-editor-inner{display:flex;max-height:480px;overflow:auto}
+.code-line-nums{padding:12px 0;text-align:right;user-select:none;flex-shrink:0;background:rgba(0,0,0,.15);color:#4a5568;font-size:11px;line-height:1.6}
+.light .code-line-nums{background:rgba(0,0,0,.04);color:#a0aec0}
+.code-line-nums span{display:block;padding:0 10px 0 14px}
+.code-editor-inner pre{margin:0;padding:12px 16px;flex:1;overflow:visible}
+.code-editor-inner code{font-family:inherit;font-size:inherit;line-height:inherit;white-space:pre}
+/* Syntax token colors (dark) */
+.hljs-keyword{color:#bb9af7}
+.hljs-built_in{color:#7dcfff}
+.hljs-string{color:#9ece6a}
+.hljs-number{color:#ff9e64}
+.hljs-comment{color:#565f89;font-style:italic}
+.hljs-function{color:#7aa2f7}
+.hljs-title{color:#7aa2f7}
+.hljs-variable{color:#c0caf5}
+.hljs-regexp{color:#b4f9f8}
+.hljs-operator{color:#89ddff}
+.hljs-punctuation{color:#c0caf5}
+.hljs{color:#c0caf5;background:transparent}
+/* Syntax token colors (light) */
+.light .hljs-keyword{color:#7c3aed}
+.light .hljs-built_in{color:#0369a1}
+.light .hljs-string{color:#16a34a}
+.light .hljs-number{color:#c2410c}
+.light .hljs-comment{color:#94a3b8;font-style:italic}
+.light .hljs-function,.light .hljs-title{color:#1d4ed8}
+.light .hljs-variable{color:#1e293b}
+.light .hljs-regexp{color:#0891b2}
+.light .hljs-operator{color:#0369a1}
+.light .hljs{color:#1e293b;background:transparent}
+/* ── Style editor ── */
+.style-section{background:var(--bg1);border:0.5px solid var(--border);border-radius:7px;padding:12px 14px;margin-bottom:10px}
+.style-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.style-row{display:flex;flex-direction:column;gap:3px}
+.style-label{font-size:11px;color:var(--text3);font-weight:500}
+.style-input{display:flex;align-items:center;gap:6px}
+.style-input input[type=color]{width:32px;height:26px;border:0.5px solid var(--border-s);border-radius:4px;cursor:pointer;padding:1px;background:var(--bg1)}
+.style-input input[type=text]{flex:1;font-size:12px}
+.style-input input[type=number]{width:64px;font-size:12px}
+.style-preview{background:#1a1b26;border:0.5px solid var(--border);border-radius:6px;padding:12px;font-size:12px;margin-top:8px}
+.light .style-preview{background:#f8f9fc}
+
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo">T</div>
+    <div>
+      <div class="title">Thinkific Field Modifier</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="btn sm accent" id="btn-openExport">↓ Export</button>
+    <button class="btn sm" id="btn-openImport">↑ Import</button>
+    <button class="theme-btn" id="btn-toggleTheme">☀ Light mode</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div id="scanNotice" style="display:none"></div>
+  <div id="importSuccess" style="display:none" class="notice success">✓ Configuration loaded successfully.</div>
+
+  <div class="topbar">
+    <div class="topbar-l">
+      <div class="stepper">
+        <button id="btn-countDown">−</button>
+        <span class="count" id="countDisplay">2</span>
+        <button id="btn-countUp">+</button>
+      </div>
+      <span style="font-size:13px;color:var(--text2)">fields &nbsp;<span id="idxRange" style="color:var(--text3)">(indices 0–1)</span></span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="fields">Fields</button>
+    <button class="tab" data-tab="conditionals">Conditionals</button>
+    <button class="tab" data-tab="pages">Pages</button>
+    <button class="tab" data-tab="code">Generated code</button>
+  </div>
+
+  <div id="tab-fields"><div id="fieldsList"></div></div>
+
+  <div id="tab-conditionals" style="display:none">
+    <!-- Conditional sub-tabs -->
+    <div class="sub-tabs">
+      <button class="sub-tab active" data-subtab="visibility">Field visibility</button>
+      <button class="sub-tab" data-subtab="dependent">Dependent options</button>
+      <button class="sub-tab" data-subtab="groupvisibility">Group show/hide</button>
+    </div>
+
+    <div id="subtab-visibility">
+      <div class="notice" style="margin-bottom:8px"><strong>Field visibility:</strong> a master dropdown shows/hides other fields based on its selected value.</div>
+      <div style="margin-bottom:10px">
+        <button class="btn add sm" data-addrule="visibility">+ Add field visibility rule</button>
+      </div>
+      <div id="rulesList-visibility"></div>
+    </div>
+
+    <div id="subtab-dependent" style="display:none">
+      <div class="notice" style="margin-bottom:8px"><strong>Dependent options:</strong> selecting a value in one dropdown filters the options shown in another. Hidden masters are skipped.</div>
+      <div style="margin-bottom:10px">
+        <button class="btn add sm" data-addrule="dependent">+ Add dependent options rule</button>
+      </div>
+      <div id="rulesList-dependent"></div>
+    </div>
+
+    <div id="subtab-groupvisibility" style="display:none">
+      <div class="notice" style="margin-bottom:8px"><strong>Group show/hide:</strong> shows or hides a field on the account page based on the user's Thinkific group membership. Reads <code>Thinkific.current_user.groups</code>.</div>
+      <div style="margin-bottom:10px">
+        <button class="btn add sm" data-addrule="groupvisibility">+ Add group show/hide rule</button>
+      </div>
+      <div id="rulesList-groupvisibility"></div>
+    </div>
+  </div>
+
+  <div id="tab-pages" style="display:none"><div id="pagesContent"></div></div>
+
+  <div id="tab-code" style="display:none">
+    <div class="sub-tabs" style="margin-bottom:12px">
+      <button class="sub-tab active" data-subtab="codeeditor">Generated code</button>
+      <button class="sub-tab" data-subtab="styleeditor">Style editor</button>
+    </div>
+
+    <div id="subtab-codeeditor">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div class="notice" style="margin:0;flex:1;margin-right:8px">Paste before <code>&lt;/body&gt;</code> in your Thinkific theme.liquid</div>
+        <button class="btn sm" id="btn-copyCode">⎘ Copy</button>
+      </div>
+      <div class="code-editor-wrap">
+        <div class="code-editor-inner">
+          <div class="code-line-nums" id="lineNums"></div>
+          <pre><code class="language-javascript" id="codeOut"></code></pre>
+        </div>
+      </div>
+    </div>
+
+    <div id="subtab-styleeditor" style="display:none">
+      <div class="notice" style="margin-bottom:12px">Set custom styles for Thinkific form elements. Leave fields blank to use Thinkific's defaults. A <code>&lt;style&gt;</code> block will be appended to your generated code.</div>
+
+      <div class="style-section">
+        <div class="sub-label" style="margin-bottom:10px">Form inputs <span style="color:var(--text3);font-weight:400">(text, select, date fields)</span></div>
+        <div class="style-grid">
+          <div class="style-row">
+            <span class="style-label">Background color</span>
+            <div class="style-input"><input type="color" id="style-input-bg" value="#ffffff"><input type="text" id="style-input-bg-text" placeholder="#ffffff or transparent"></div>
+          </div>
+          <div class="style-row">
+            <span class="style-label">Text color</span>
+            <div class="style-input"><input type="color" id="style-input-color" value="#000000"><input type="text" id="style-input-color-text" placeholder="#000000"></div>
+          </div>
+          <div class="style-row">
+            <span class="style-label">Border color</span>
+            <div class="style-input"><input type="color" id="style-input-border" value="#cccccc"><input type="text" id="style-input-border-text" placeholder="#cccccc"></div>
+          </div>
+          <div class="style-row">
+            <span class="style-label">Border radius</span>
+            <div class="style-input"><input type="text" id="style-input-radius" placeholder="e.g. 4px or 0"></div>
+          </div>
+          <div class="style-row">
+            <span class="style-label">Font size</span>
+            <div class="style-input"><input type="text" id="style-input-fontsize" placeholder="e.g. 14px"></div>
+          </div>
+          <div class="style-row">
+            <span class="style-label">Padding</span>
+            <div class="style-input"><input type="text" id="style-input-padding" placeholder="e.g. 8px 12px"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="style-section">
+        <div class="sub-label" style="margin-bottom:10px">Form labels</div>
+        <div class="style-grid">
+          <div class="style-row">
+            <span class="style-label">Text color</span>
+            <div class="style-input"><input type="color" id="style-label-color" value="#000000"><input type="text" id="style-label-color-text" placeholder="#000000"></div>
+          </div>
+          <div class="style-row">
+            <span class="style-label">Font size</span>
+            <div class="style-input"><input type="text" id="style-label-fontsize" placeholder="e.g. 13px"></div>
+          </div>
+          <div class="style-row">
+            <span class="style-label">Font weight</span>
+            <div class="style-input"><input type="text" id="style-label-weight" placeholder="e.g. 600 or bold"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="style-section">
+        <div class="sub-label" style="margin-bottom:10px">Submit button</div>
+        <div class="style-grid">
+          <div class="style-row">
+            <span class="style-label">Background color</span>
+            <div class="style-input"><input type="color" id="style-btn-bg" value="#6366f1"><input type="text" id="style-btn-bg-text" placeholder="#6366f1"></div>
+          </div>
+          <div class="style-row">
+            <span class="style-label">Text color</span>
+            <div class="style-input"><input type="color" id="style-btn-color" value="#ffffff"><input type="text" id="style-btn-color-text" placeholder="#ffffff"></div>
+          </div>
+          <div class="style-row">
+            <span class="style-label">Border radius</span>
+            <div class="style-input"><input type="text" id="style-btn-radius" placeholder="e.g. 6px"></div>
+          </div>
+          <div class="style-row">
+            <span class="style-label">Font size</span>
+            <div class="style-input"><input type="text" id="style-btn-fontsize" placeholder="e.g. 15px"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="style-section">
+        <div class="sub-label" style="margin-bottom:10px">Read-only fields <span style="color:var(--text3);font-weight:400">(fields marked Read only)</span></div>
+        <div class="style-grid">
+          <div class="style-row">
+            <span class="style-label">Background color</span>
+            <div class="style-input"><input type="color" id="style-ro-bg" value="#f5f5f4"><input type="text" id="style-ro-bg-text" placeholder="#f5f5f4"></div>
+          </div>
+          <div class="style-row">
+            <span class="style-label">Text color</span>
+            <div class="style-input"><input type="color" id="style-ro-color" value="#888888"><input type="text" id="style-ro-color-text" placeholder="#888888"></div>
+          </div>
+          <div class="style-row">
+            <span class="style-label">Border color</span>
+            <div class="style-input"><input type="color" id="style-ro-border" value="#cccccc"><input type="text" id="style-ro-border-text" placeholder="#cccccc"></div>
+          </div>
+          <div class="style-row">
+            <span class="style-label">Cursor</span>
+            <div class="style-input"><input type="text" id="style-ro-cursor" placeholder="e.g. not-allowed"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:4px">
+        <button class="btn sm danger" id="btn-clearStyles">✕ Clear all styles</button>
+        <button class="btn sm accent" id="btn-copyCode2">⎘ Copy full code (JS + styles)</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Limitations Modal -->
+<div id="limitationsModal" style="display:none">
+  <div class="modal-overlay">
+    <div class="modal" style="max-width:560px">
+      <div class="modal-title">⚠ Limitations</div>
+      <p style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:10px">Code implemented on custom fields relies heavily on the <em>order</em> of the custom fields, from top to bottom. If the order is changed, or a new custom field is added and inserted somewhere that isn't the bottom of the list, the custom code generated by this tool will break.</p>
+      <p style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:8px">For very complex situations, we recommend enabling <strong>Custom CSS: Dashboard</strong> and adding this code snippet. It hides the buttons used to re-arrange and delete custom fields. This will help prevent accidental changes that break the code.</p>
+      <p style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:8px">Please see this short video for more information: https://view.thnk.cc/rRue74Qr</p>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:6px">
+        <button class="btn xs" id="btn-copyLimitationsCss">⎘ Copy</button>
+      </div>
+      <div class="code-wrap" id="limitationsCssBlock" style="max-height:220px">/* This bit of code hides the delete button, and drag button on
+custom fields in the settings. This is recommended when complex
+custom code is used to enhance custom fields.
+
+If you wish to re-order or delete a custom field, please make sure
+your custom code is adjusted appropriately */
+#settings .toga-icon-handle-drag,
+#settings .delete-def-btn {
+    display: none;
+}</div>
+      <div class="modal-actions">
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);margin-right:auto;cursor:pointer"><input type="checkbox" id="limitationsDontShow" style="accent-color:#6366f1;cursor:pointer"/> Don't show this again</label>
+        <button class="btn sm primary" id="btn-closeLimitations">Got it</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Export Modal -->
+<div id="exportModal" style="display:none">
+  <div class="modal-overlay">
+    <div class="modal">
+      <div class="modal-title">Export configuration</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:12px">Choose a filename for your configuration.</p>
+      <div class="filename-row">
+        <input type="text" id="exportFilename" placeholder="thinkific-field-config" value="thinkific-field-config"/>
+        <span class="ext-label">.json</span>
+      </div>
+      <div class="modal-actions">
+        <button class="btn sm" id="btn-closeExport">Cancel</button>
+        <button class="btn sm primary" id="btn-doExport">↓ Download</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Import Modal -->
+<div id="importModal" style="display:none">
+  <div class="modal-overlay">
+    <div class="modal">
+      <div class="modal-title">Import configuration</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:12px">Upload a previously exported <code>.json</code> file. This will replace all current settings.</p>
+      <div class="drop-zone" id="dropZone" data-dragover="1" data-dragleave="1" data-drop="1">
+        <span class="dz-icon">⬆</span>
+        Click to choose a file, or drag and drop here
+        <div class="file-name" id="fileName" style="display:none"></div>
+      </div>
+      <input type="file" id="fileInput" accept=".json,application/json" style="display:none" />
+      <div class="err-msg" id="importError" style="display:none"></div>
+      <div class="modal-actions">
+        <button class="btn sm" id="btn-closeImport">Cancel</button>
+        <button class="btn sm add" id="btn-doImport" disabled style="opacity:.4;cursor:not-allowed">✓ Load configuration</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="editor.js"></script>
+<script src="highlight.min.js"></script>
+</body>
+</html>
